@@ -2,10 +2,12 @@ package objectclasses;
 
 import utils.Defs;
 
+import static utils.Defs.FILE_DELIMITER;
+
 public class Application
 {
     private Defs.ApplicationType applicationType;
-    private String applicationId;
+    private String applicationID;
     private String adminEnjinUsername;
     private String enjinUsername;
     private String gw2Username;
@@ -14,17 +16,17 @@ public class Application
 
     /**
      * Standard constructor for applications that include a Discord username.
-     * @param applicationId Application ID retrieved from the getApplications list.
+     * @param applicationID Application ID retrieved from the getApplications list.
      * @param adminEnjinUsername The Enjin username of the admin that approved the application.
      * @param enjinUsername The Enjin username of the approved user.
      * @param gw2Username The Guild Wars 2 username of the approved user.
      * @param alias The alias of the approved user.
      * @param discordUsername The Discord username of the approved user.
      */
-    public Application(String applicationId, String adminEnjinUsername, String enjinUsername, String gw2Username, String alias, String discordUsername)
+    public Application(String applicationID, String adminEnjinUsername, String enjinUsername, String gw2Username, String alias, String discordUsername)
     {
         this.applicationType = Defs.ApplicationType.STANDARD;
-        this.applicationId = applicationId;
+        this.applicationID = applicationID;
         this.adminEnjinUsername = adminEnjinUsername;
         this.enjinUsername = enjinUsername;
         this.gw2Username = gw2Username;
@@ -34,16 +36,16 @@ public class Application
 
     /**
      * Constructor for legacy applications that don't include a Discord username.
-     * @param applicationId Application ID retrieved from the getApplications list.
+     * @param applicationID Application ID retrieved from the getApplications list.
      * @param adminEnjinUsername The Enjin username of the admin that approved the application.
      * @param enjinUsername The Enjin username of the approved user.
      * @param gw2Username The Guild Wars 2 username of the approved user.
      * @param alias The alias of the approved user.
      */
-    public Application(String applicationId, String adminEnjinUsername, String enjinUsername, String gw2Username, String alias)
+    public Application(String applicationID, String adminEnjinUsername, String enjinUsername, String gw2Username, String alias)
     {
         this.applicationType = Defs.ApplicationType.LEGACY;
-        this.applicationId = applicationId;
+        this.applicationID = applicationID;
         this.adminEnjinUsername = adminEnjinUsername;
         this.enjinUsername = enjinUsername;
         this.gw2Username = gw2Username;
@@ -52,50 +54,43 @@ public class Application
 
     /**
      * Constructor for very old applications that don't include an alias or Guild Wars 2 / Discord username.
-     * @param applicationId Application ID retrieved from the getApplications list.
+     * @param applicationID Application ID retrieved from the getApplications list.
      * @param adminEnjinUsername The Enjin username of the admin that approved the application.
      * @param enjinUsername The Enjin username of the approved user.
      */
-    public Application(String applicationId, String adminEnjinUsername, String enjinUsername)
+    public Application(String applicationID, String adminEnjinUsername, String enjinUsername)
     {
         this.applicationType = Defs.ApplicationType.ANCIENT;
-        this.applicationId = applicationId;
+        this.applicationID = applicationID;
         this.adminEnjinUsername = adminEnjinUsername;
         this.enjinUsername = enjinUsername;
     }
 
-    public Defs.ApplicationType getApplicationType()
+    @Override
+    public String toString()
     {
-        return applicationType;
-    }
+        String applicationToString = "\"" + applicationID.replaceAll("\"", "\\\"") + "\"" + FILE_DELIMITER +
+                "\"" + adminEnjinUsername.replaceAll("\"", "\\\"") + "\"" + FILE_DELIMITER +
+                "\"" + enjinUsername.replaceAll("\"", "\\\"") + "\"" + FILE_DELIMITER;
 
-    public String getApplicationId()
-    {
-        return applicationId;
-    }
+        switch (applicationType)
+        {
+            case ANCIENT:
+                applicationToString += FILE_DELIMITER + FILE_DELIMITER;
+                break;
 
-    public String getAdminEnjinUsername()
-    {
-        return adminEnjinUsername;
-    }
+            case LEGACY:
+                applicationToString += "\"" + gw2Username.replaceAll("\"", "\\\"") + "\"" + FILE_DELIMITER +
+                        "\"" + alias.replaceAll("\"", "\\\"") + "\"" + FILE_DELIMITER;
+                break;
 
-    public String getEnjinUsername()
-    {
-        return enjinUsername;
-    }
+            case STANDARD:
+                applicationToString += "\"" + gw2Username.replaceAll("\"", "\\\"") + "\"" + FILE_DELIMITER +
+                        "\"" + alias.replaceAll("\"", "\\\"") + "\"" + FILE_DELIMITER +
+                        "\"" + discordUsername.replaceAll("\"", "\\\"") + "\"";
+                break;
+        }
 
-    public String getGw2Username()
-    {
-        return gw2Username;
-    }
-
-    public String getAlias()
-    {
-        return alias;
-    }
-
-    public String getDiscordUsername()
-    {
-        return discordUsername;
+        return applicationToString;
     }
 }

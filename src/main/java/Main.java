@@ -1,3 +1,4 @@
+import objectclasses.Application;
 import utils.Defs;
 import utils.EnjinAPI;
 import utils.FileIO;
@@ -7,6 +8,9 @@ import java.util.List;
 
 public class Main
 {
+    /**
+     * Main method.
+     */
     public static void main(String[] args)
     {
         // Set up the interface for making requests to Enjin's API.
@@ -18,7 +22,9 @@ public class Main
                 Defs.API_DOMAIN);
 
         List<String> applicationIDs = enjinAPI.getApplicationIDs();
-        writeApplicationIDsToFile(applicationIDs);
+        updateApplicationIDsFile(applicationIDs);
+        List<Application> applications = enjinAPI.getApplicationsFromIDList(applicationIDs);
+        updateApplicationsFile(applications);
     }
 
     /**
@@ -26,12 +32,12 @@ public class Main
      * @param applicationIDs A list of strings of application IDs. These should be just IDs that are not in our local
      *                       copy of the IDs but were returned from the API.
      */
-    private static void writeApplicationIDsToFile(List<String> applicationIDs)
+    private static void updateApplicationIDsFile(List<String> applicationIDs)
     {
         try
         {
             System.out.print("Writing application IDs to file... ");
-            FileIO.writeToFile(applicationIDs);
+            FileIO.writeIDsToFile(applicationIDs);
             System.out.println("Done!");
         }
         catch (ClassNotFoundException e)
@@ -41,6 +47,25 @@ public class Main
         catch (IOException e)
         {
             System.out.println("Error, IO exception!\n" + e.getMessage());
+        }
+    }
+
+    /**
+     * Write the applications returned from the getApplicationsFromIDList method to a file.
+     * @param applications A list of Application objects. These should be just applications that are not in our local
+     **                    copy of the applications but were returned from the API.
+     */
+    private static void updateApplicationsFile(List<Application> applications)
+    {
+        try
+        {
+            System.out.print("Writing applications to file... ");
+            FileIO.writeApplicationsToFile(applications);
+            System.out.println("Done!");
+        }
+        catch (IOException e)
+        {
+            System.out.println("Error, IO exception!\\n" + e.getMessage());
         }
     }
 }
