@@ -66,6 +66,10 @@ public class Application
         this.enjinUsername = enjinUsername;
     }
 
+    /**
+     * Override of the toString() method that converts the application to a single row in a CSV file.
+     * @return An application as a string row to place directly into the file.
+     */
     @Override
     public String toString()
     {

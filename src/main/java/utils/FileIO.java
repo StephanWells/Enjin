@@ -10,6 +10,7 @@ public class FileIO
 {
     private static final String APPLICATION_IDS_PATH = "src/main/resources/applicationIDs.tmp";
     private static final String APPLICATIONS_PATH = "src/main/resources/applications.csv";
+    private static final String APPLICATIONS_PATH_DROPBOX = "C:/Users/steph/Dropbox/applications.csv";
 
     /**
      * Retrieves the last ID in the file, i.e. the latest application ID in our local version of application IDs.
@@ -52,7 +53,17 @@ public class FileIO
         List<String> applicationsFileRows = readApplicationsFile();
         applicationRows.addAll(applicationsFileRows);
 
+        // Write to local.
         try (FileWriter writer = new FileWriter(APPLICATIONS_PATH))
+        {
+            for (String row : applicationRows)
+            {
+                writer.write(row + System.lineSeparator());
+            }
+        }
+
+        // Write to Dropbox.
+        try (FileWriter writer = new FileWriter(APPLICATIONS_PATH_DROPBOX))
         {
             for (String row : applicationRows)
             {
