@@ -136,6 +136,10 @@ public class EnjinAPI
         {
             System.out.println("Interrupted Error!\n" + e.getMessage());
         }
+        catch (JSONException e)
+        {
+            System.out.println("JSON Error!\n" + e.getMessage());
+        }
 
         return applicationIds;
     }
@@ -147,7 +151,7 @@ public class EnjinAPI
      * @throws IOException Generic IOException.
      * @throws InterruptedException The call to the API failed.
      */
-    private Iterator<Object> getApplicationIdPage(int page) throws IOException, InterruptedException
+    private Iterator<Object> getApplicationIdPage(int page) throws IOException, InterruptedException, JSONException
     {
         System.out.print("Page: " + page + "... ");
         HttpRequest request = HttpRequest.newBuilder()
@@ -156,9 +160,16 @@ public class EnjinAPI
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         JSONObject responseJson = new JSONObject(response.body());
-        JSONArray applicationsJson = responseJson.getJSONObject("result").getJSONArray("items");
 
-        return applicationsJson.iterator();
+        try
+        {
+            JSONArray applicationsJson = responseJson.getJSONObject("result").getJSONArray("items");
+            return applicationsJson.iterator();
+        }
+        catch (JSONException e)
+        {
+            throw new JSONException(responseJson.getJSONObject("error").getString("message"));
+        }
     }
 
     /**
