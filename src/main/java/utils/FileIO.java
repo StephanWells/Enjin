@@ -3,6 +3,9 @@ package utils;
 import objectclasses.Application;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +13,7 @@ public class FileIO
 {
     private static final String APPLICATION_IDS_PATH = "src/main/resources/applicationIDs.tmp";
     private static final String APPLICATIONS_PATH = "src/main/resources/applications.csv";
+    private static final String SESSION_ID_PATH = "src/main/resources/sessionId.txt";
     private static final String APPLICATIONS_PATH_DROPBOX = "C:/Users/steph/Dropbox/applications.csv";
 
     /**
@@ -124,5 +128,38 @@ public class FileIO
         }
 
         return applicationRows;
+    }
+
+    /**
+     * Returns the sessionId value from sessionId.txt.
+     * @return A string of the sessionId.
+     */
+    public static String returnSessionId()
+    {
+        try
+        {
+            return Files.readString(Paths.get(SESSION_ID_PATH));
+        }
+        catch (IOException e)
+        {
+            System.out.println("Error while retrieving sessionId!\n" + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Writes a new sessionId to sessionId.txt.
+     * @param sessionId A string of the new sessionId to write to file.
+     */
+    public static void updateSessionId(String sessionId)
+    {
+        try
+        {
+            Files.writeString(Paths.get(SESSION_ID_PATH), sessionId, StandardCharsets.UTF_8);
+        }
+        catch (IOException e)
+        {
+            System.out.println("Error while writing new sessionId!\n" + e.getMessage());
+        }
     }
 }

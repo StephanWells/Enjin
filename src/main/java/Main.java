@@ -1,10 +1,12 @@
 import objectclasses.Application;
+import org.json.JSONException;
 import utils.Defs;
 import utils.EnjinAPI;
 import utils.FileIO;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Scanner;
 
 public class Main
 {
@@ -13,6 +15,8 @@ public class Main
      */
     public static void main(String[] args)
     {
+        Defs.init(); // Initialise any dynamic API values.
+
         // Set up the interface for making requests to Enjin's API.
         EnjinAPI enjinAPI = new EnjinAPI(
                 Defs.API_JSONRPC,
@@ -21,6 +25,37 @@ public class Main
                 Defs.API_SESSION_ID,
                 Defs.API_DOMAIN);
 
+        try
+        {
+            updateApplications(enjinAPI);
+        }
+        catch (JSONException e)
+        {
+            System.out.println("JSON Error!\n" + e.getMessage());
+
+            // If session ID is expired.
+            if (e.getMessage().contains("Authentication Failed"))
+            {
+                System.out.print("Please enter new sessionId: ");
+                Scanner sc = new Scanner(System.in);
+                Defs.API_SESSION_ID = sc.next();
+                FileIO.updateSessionId(Defs.API_SESSION_ID);
+                System.out.println("Retrying...");
+
+                enjinAPI = new EnjinAPI(
+                        Defs.API_JSONRPC,
+                        Defs.API_ID,
+                        Defs.API_KEY,
+                        Defs.API_SESSION_ID,
+                        Defs.API_DOMAIN);
+
+                updateApplications(enjinAPI);
+            }
+        }
+    }
+
+    private static void updateApplications(EnjinAPI enjinAPI)
+    {
         List<String> applicationIDs = enjinAPI.getApplicationIDs();
         updateApplicationIDsFile(applicationIDs);
         List<Application> applications = enjinAPI.getApplicationsFromIDList(applicationIDs);

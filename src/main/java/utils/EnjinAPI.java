@@ -13,6 +13,7 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Scanner;
 
 public class EnjinAPI
 {
@@ -41,10 +42,19 @@ public class EnjinAPI
     public static final String KEY_APPLICATION_ID = "application_id";
     public static final String KEY_ADMIN_ENJIN_USERNAME = "admin_username";
     public static final String KEY_ENJIN_USERNAME = "username";
+    public static final String KEY_USER_DATA = "user_data";
+    public static final String KEY_TITLE = "title";
+
+    // API Response Keys for regular apps.
     public static final String KEY_GW2_USERNAME = "mqjpat5kz4";
     public static final String KEY_ALIAS = "3r5onxb4rg";
     public static final String KEY_DISCORD_USERNAME = "5smwqmm6wu";
-    public static final String KEY_USER_DATA = "user_data";
+
+    // API Response Keys for re-apps.
+    public static final String KEY_GW2_USERNAME_RE = "8ip0opwhv1";
+    public static final String KEY_ALIAS_RE = "w09qlcjc7b";
+    public static final String KEY_DISCORD_USERNAME_RE = "c5k8s1bxfe";
+    public static final String VALUE_REAPP_TITLE = "RE-application form";
 
     /**
      * Constructor.
@@ -68,7 +78,7 @@ public class EnjinAPI
      * Method for retrieving new application IDs from the Enjin APIs. These can be used to get actual application info.
      * @return Returns a list of applications that are not already in the applicationIDs file.
      */
-    public List<String> getApplicationIDs()
+    public List<String> getApplicationIDs() throws JSONException
     {
         List<String> applicationIds = new ArrayList<>();
 
@@ -135,10 +145,6 @@ public class EnjinAPI
         catch (InterruptedException e)
         {
             System.out.println("Interrupted Error!\n" + e.getMessage());
-        }
-        catch (JSONException e)
-        {
-            System.out.println("JSON Error!\n" + e.getMessage());
         }
 
         return applicationIds;
@@ -257,16 +263,20 @@ public class EnjinAPI
         String applicationID = result.getString(KEY_APPLICATION_ID);
         String adminEnjinUsername = result.getString(KEY_ADMIN_ENJIN_USERNAME);
         String enjinUsername = result.getString(KEY_ENJIN_USERNAME);
+        String title = result.getString(KEY_TITLE); // We need this to check if
 
         try
         {
             JSONObject userData = result.getJSONObject(KEY_USER_DATA);
-            String gw2Username = userData.getString(KEY_GW2_USERNAME);
-            String alias = userData.getString(KEY_ALIAS);
+            String gw2Username = userData.getString(
+                    title.equals(VALUE_REAPP_TITLE) ? KEY_GW2_USERNAME_RE : KEY_GW2_USERNAME);
+            String alias = userData.getString(
+                    title.equals(VALUE_REAPP_TITLE) ? KEY_ALIAS_RE : KEY_ALIAS);
             // If we got this far the application isn't an ancient application but might be a legacy one.
             try
             {
-                String discordUsername = userData.getString(KEY_DISCORD_USERNAME);
+                String discordUsername = userData.getString(
+                        title.equals(VALUE_REAPP_TITLE) ? KEY_DISCORD_USERNAME_RE : KEY_DISCORD_USERNAME);
                 return new Application(applicationID, adminEnjinUsername, enjinUsername,
                                 gw2Username, alias, discordUsername); // If we got this far, the application is a standard one.
             }

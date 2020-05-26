@@ -92,3 +92,4 @@ fabric.properties
 # Project-specific
 src/main/resources/*.tmp
 src/main/resources/*.csv
+src/main/resources/*.txt
